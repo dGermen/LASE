@@ -26,6 +26,16 @@ class WhooshIRProcessor:
                     self.index_pdf(writer, pdf_path)
 
         writer.commit()
+    
+    def add_index(self, f_name):
+        pdf_path = os.path.join(self.pdf_dir, f_name)
+        if not os.path.exists(self.index_dir):
+            os.mkdir(self.index_dir)
+
+        ix = open_dir(self.index_dir)
+        writer = ix.writer()
+        self.index_pdf(writer, pdf_path)
+        writer.commit()
 
     def index_pdf(self, writer, pdf_path):
         with open(pdf_path, 'rb') as file:
