@@ -4,11 +4,10 @@ import fitz
 
 class PDFProcessor:
 
-    def __init__(self, pdf_path):
-        self.pdf_path = pdf_path
+    def __init__(self, folder_path):
+        self.folder_path = folder_path
 
     def get_abstract(self, doc):
-        abstract_section_started = False
         abstract_text = ""
 
         for i in range(len(doc)):
@@ -47,14 +46,15 @@ class PDFProcessor:
                     full_text += block_text + ' '
         return full_text.strip()  # .strip() removes leading/trailing spaces
 
-    def process_pdf(self):
-        doc = fitz.open(self.pdf_path)
+    def process_pdf(self, file_name):
+        path = os.path.join(self.folder_path, file_name)
+        doc = fitz.open(self.path)
         blocks = [{"bbox": block[:4], "text": block[4]} for page in doc for block in page.get_text("blocks")]
         paper = {}
         paper["id"] = 0
         paper["title"] = self.get_title(blocks)
         paper["abstract"] = self.get_abstract(blocks)
-        paper["dir"] = self.pdf_path
+        paper["dir"] = path
         paper["embeddings"] = "" # fill this later
         text = self.extract_text_from_pdf(self.pdf_path)
         return paper, text
