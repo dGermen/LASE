@@ -85,7 +85,7 @@ class embed_manager:
 class embed_manager_2:
 
     def __init__(self,
-                 openai_apikey="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",
+                 openai_apikey="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",
                 model = "text-embedding-ada-002", 
                 embeddings_dir = "data/embeddings.csv") -> None:
         
@@ -95,6 +95,14 @@ class embed_manager_2:
         # Load embeddings
         self.load_embeddings()
 
-    def load_embeddings(self):
-        # Scans json files in 
+    def embed_content(self, content):
+            
+        response = openai.Embedding.create(
+        input=content,
+        model=self.model
+        )
+
+        embeddings = response['data'][0]['embedding']
+
+        return
         
