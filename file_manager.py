@@ -10,7 +10,8 @@ class FileManager:
 
     def file_processor(self, file_name):
         # 1. whoosh processing
-        self.whoosh.add_index(file_name)
+        config += 1
+        self.whoosh.add_index(file_name, config)
 
         # 2. pdf extractor 
         # metadata = {title: ,
@@ -24,7 +25,7 @@ class FileManager:
 
         # 4. add id and embeddings fields to dict
         metadata["embedding"] = text_embed
-        config += 1
+        
         metadata["id"] = config
 
         # 5. return metadata & embeds
