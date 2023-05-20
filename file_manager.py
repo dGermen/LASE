@@ -1,17 +1,19 @@
+import time
+
 class FileManager:
 
-    def __init__(self, folder_path, pdf_processor, embedder, whoosh, config):
+    def __init__(self, folder_path, pdf_processor, embedder, whoosh):
         self.PDF_manager = pdf_processor
         self.whoosh = whoosh
         self.embedder = embedder
         self.folder_path = folder_path
-        self.config = config
     
 
     def file_processor(self, file_name):
+        id = time.time()
+        
         # 1. whoosh processing
-        config += 1
-        self.whoosh.add_index(file_name, config)
+        self.whoosh.add_index(file_name, id)
 
         # 2. pdf extractor 
         # metadata = {title: ,

@@ -51,15 +51,15 @@ class PDFProcessor:
         doc = fitz.open(path)
         blocks = [{"bbox": block[:4], "text": block[4]} for page in doc for block in page.get_text("blocks")]
         paper = {}
-        paper["id"] = 0
         paper["title"] = self.get_title(blocks)
         paper["abstract"] = self.get_abstract(blocks)
         paper["dir"] = path
-        paper["embeddings"] = "" # fill this later
         text = self.extract_text_from_pdf(path)
         return paper, text
 
+"""
 # Usage:
 pdf_processor = PDFProcessor('papers2')
 metadata, text = pdf_processor.process_pdf("181_dual_lottery_ticket_hypothesis.pdf")
 print(metadata, text)
+"""
