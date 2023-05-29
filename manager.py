@@ -11,13 +11,13 @@ class manager:
         self.paper_dir = paper_dir
 
         # Load "data"s
+        self.load_data()
 
         # Initilizing used modules
         self.whoosh_manager = whoosh_manager.WhooshIRProcessor(
             index_dir = self.index_dir)
 
         self.embed_manager = embed_manager.EmbedManager(
-            index_dir = self.index_dir,
             embed_data = self.embed_data)
         
         self.file_manager = file_manager.FileManager(
@@ -44,6 +44,14 @@ class manager:
     def scan(self):
         # Scan the whole folder for new files
         self.file_manager.scan()
+
+    def load_data(self):
+        # TODO load data from files
+        # self.embed_data, self.vis_data, somehow read the whoosh?
+        pass
+    
+    def query(self,query):
+        return self.query_manager.query(query)
 
 
 
