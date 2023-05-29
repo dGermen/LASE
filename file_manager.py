@@ -56,8 +56,18 @@ class FileManager:
             id = self.generate_id()
             # Get the dict for vis_data and text for embedding using process_pdf
             paper_dict, text = self.process_pdf(path)
+
+
+            ###### OPEN HERE !! ######
             # Get the embedding    
-            embedding = self.embed_manager.embed(text)
+            # embedding = self.embed_manager.embed(text)
+
+            ######### DELETE HERE !! ##########
+            # get a random np array of 1536 dims
+            embedding = np.random.rand(1536)
+            ######### DELETE HERE !! ##########
+
+
             # Add to index
             # Schema(id=NUMERIC(stored=True, unique=True), title=TEXT(stored=True), content=TEXT(stored=True))
             self.whoosh_manager.add_index(path, id)
@@ -65,10 +75,10 @@ class FileManager:
             self.vis_data[id] = paper_dict
             # Add id infornt of embedding
             embedding = np.insert(embedding, 0, id)
-            # Reshape embedding, shape (0,)
 
             # Update the new_embeddings list (which will become self.embed_data)
-            self.embed_data = np.vstack((self.embed_data, embedding),axis = 0)
+            self.embed_data = np.vstack((self.embed_data, embedding))
+            #print(self.embed_data)
             # Add the paper to self.all_papers
             self.all_papers.add(paper)
             #except Exception as e:
@@ -80,6 +90,7 @@ class FileManager:
     
     # loads the pickled vis_data and embed_data
     def load(self):
+        
         # check if the path: self.index_dir + self.vis_data_fname exists
         vis_data_path = os.path.join(self.index_dir, self.vis_data_fname)  
         if os.path.exists(vis_data_path):
@@ -102,7 +113,7 @@ class FileManager:
             with open(embed_data_path, 'rb') as f:
                 self.embed_data = np.load(f, allow_pickle=True)
         else:
-            self.embed_data = np.empty((0, 2), dtype=object)
+            self.embed_data = np.empty((0, 1537), dtype=object)
 
 
         

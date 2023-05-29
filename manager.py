@@ -67,7 +67,7 @@ class Manager:
             with open(embed_data_path, 'rb') as f:
                 self.embed_data = np.load(f, allow_pickle=True)
         else:
-            self.embed_data = np.empty((0, 2), dtype=object)
+            self.embed_data = np.empty((0, 1537), dtype=object)
 
     
     def query(self,query):
@@ -76,6 +76,9 @@ class Manager:
         result = self.file_manager.check_if_files_exists(result)
 
         return result
+
+
+
 
 
 

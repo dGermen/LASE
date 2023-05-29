@@ -11,9 +11,13 @@ import numpy as np
 class WhooshIRProcessor:
 
     def __init__(self, index_dir) -> None:
-        self.index_dir = index_dir 
+        self.index_dir = index_dir + "/whoosh_index"
         self.schema = Schema(id=NUMERIC(stored=True, unique=True), title=TEXT(stored=True), content=TEXT(stored=True))
-        
+
+        # if index_dir dos not exist, create it
+        if not os.path.exists(self.index_dir):
+            os.mkdir(self.index_dir)
+
         try:
             self.index = index.open_dir(self.index_dir)
 
