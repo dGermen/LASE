@@ -2,12 +2,13 @@ import openai
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import sklearn
+import time
 
 class EmbedManager:
 
     def __init__(self, 
                 embed_data,
-                openai_apikey = "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",
+                openai_apikey = "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",
                 model = "text-embedding-ada-002",
                  ):
         pass
@@ -18,12 +19,22 @@ class EmbedManager:
 
     def embed(self, text):
 
+        done = False
+
+        while not done:
         # Embed the text
-        response = openai.Embedding.create(
-        input=text,
-        model=self.model
-        )
-        
+            try:
+                response = openai.Embedding.create(
+                input=text,
+                model=self.model
+                )
+                done = True
+
+            except openai.RateLimitError as e:
+                print("Rate limit error, waiting for 0.1 seconds")
+                time.sleep(0.1)
+                continue
+            
         # Extract the embeddings
         embeddings = response['data'][0]['embedding']
 

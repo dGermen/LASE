@@ -49,31 +49,34 @@ class FileManager:
         # Scan the whole folder for new files
         for paper in os.listdir(self.paper_dir):
             if paper in self.all_papers: continue  # PDF already processed                
-            try:    
-                # Get the path to PDF
-                path = os.path.join(self.paper_dir, paper) 
-                # Generate id 
-                id = self.generate_id()
-                # Get the dict for vis_data and text for embedding using process_pdf
-                paper_dict, text = self.process_pdf(path)
-                # Get the embedding    
-                embedding = self.embed_manager.embed(text)
-                # Add to index
-                # Schema(id=NUMERIC(stored=True, unique=True), title=TEXT(stored=True), content=TEXT(stored=True))
-                self.whoosh_manager.add_index(path, id)
-                # Update the vis_data
-                self.vis_data[id] = paper_dict
-                # Update the new_embeddings list (which will become self.embed_data)
-                self.embed_data = np.append(self.embed_data, new_embeddings, axis=0)
-                # Add the paper to self.all_papers
-                self.all_papers.add(paper)
-            except Exception as e:
-                print(f"Failed to process {paper}: {str(e)}") 
+            #try:    
+            # Get the path to PDF
+            path = os.path.join(self.paper_dir, paper) 
+            # Generate id 
+            id = self.generate_id()
+            # Get the dict for vis_data and text for embedding using process_pdf
+            paper_dict, text = self.process_pdf(path)
+            # Get the embedding    
+            embedding = self.embed_manager.embed(text)
+            # Add to index
+            # Schema(id=NUMERIC(stored=True, unique=True), title=TEXT(stored=True), content=TEXT(stored=True))
+            self.whoosh_manager.add_index(path, id)
+            # Update the vis_data
+            self.vis_data[id] = paper_dict
+            # Add id infornt of embedding
+            embedding = np.insert(embedding, 0, id)
+            # Reshape embedding, shape (0,)
+
+            # Update the new_embeddings list (which will become self.embed_data)
+            self.embed_data = np.vstack((self.embed_data, embedding),axis = 0)
+            # Add the paper to self.all_papers
+            self.all_papers.add(paper)
+            #except Exception as e:
+             #   print(f"Failed to process {paper}: {str(e)}") 
 
       
         # Save the vis_data and embed_data
         self.save()       
-        return self.vis_data, self.embed_data 
     
     # loads the pickled vis_data and embed_data
     def load(self):
@@ -82,20 +85,25 @@ class FileManager:
         if os.path.exists(vis_data_path):
             with open(vis_data_path, 'rb') as f:
                 self.vis_data = pickle.load(f)  
+
+            if 0 < len(self.vis_data.keys()):
+                pass
+            else:
+                for key in self.vis_data.keys():
+                    self.all_papers.add(self.vis_data[key]["path"].split("/")[-1])
+
         else: 
-            self.vis_data = None      
+            self.vis_data = dict()
+             
 
         # check if the path: self.index_dir + self.embed_data_fname exists
         embed_data_path = os.path.join(self.index_dir, self.embed_data_fname)
         if os.path.exists(embed_data_path):
             with open(embed_data_path, 'rb') as f:
-                self.embed_data = np.load(f)
+                self.embed_data = np.load(f, allow_pickle=True)
         else:
             self.embed_data = np.empty((0, 2), dtype=object)
 
-        # add all papers names to self.all_papers
-        for paper in os.listdir(self.paper_dir):
-            self.all_papers.add(paper)
 
         
     def save(self):
@@ -104,17 +112,18 @@ class FileManager:
         with open(vis_data_path, 'wb') as f:
             pickle.dump(self.vis_data, f)
 
-        # save the embed_data
+        # save np array as npy file
         embed_data_path = os.path.join(self.index_dir, self.embed_data_fname)
-        with open(embed_data_path, 'rb') as f:
-            self.embed_data = np.load(f)        
+        with open(embed_data_path, 'wb') as f:
+            np.save(f, self.embed_data)   
 
 
 
     
     def generate_id(self):
-        timestamp = time.time()
-        id = str(int(timestamp))
+
+        id = self.embed_data.shape[0] + 1
+
         return id
     
     def get_abstract(self, doc):
@@ -166,3 +175,16 @@ class FileManager:
         paper["dir"] = path
         text = self.extract_text_from_pdf_for_embedding(path)
         return paper, text    
+
+
+    def check_if_files_exists(ids_list):
+        # ids is a list of ids for whoosh and embed [w, e]
+        processed_ids = []
+        for ids in ids_list:
+            # Check if file exists in dynamic tables
+            # If not, remove from whoosh and embed
+            # Update saved files
+            # Remove from ids 
+            pass
+            
+        return processed_ids

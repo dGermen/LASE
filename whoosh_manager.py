@@ -1,4 +1,5 @@
 import os
+import whoosh
 from whoosh import index
 from whoosh.fields import Schema, TEXT, NUMERIC
 from whoosh.qparser import QueryParser
@@ -10,19 +11,28 @@ import numpy as np
 class WhooshIRProcessor:
 
     def __init__(self, index_dir) -> None:
-        self.index_dir = index_dir + "/index"
+        self.index_dir = index_dir 
         self.schema = Schema(id=NUMERIC(stored=True, unique=True), title=TEXT(stored=True), content=TEXT(stored=True))
+        
+        try:
+            self.index = index.open_dir(self.index_dir)
+
+        except Exception as e:
+            print(f"Index not found at {self.index_dir}. Creating new index.")
+            self.index = index.create_in(self.index_dir, self.schema)
+            print(f"New index created at {self.index_dir}.")
+        
+
+            
 
 
 
     def add_index(self, pdf_path, doc_id):
-        if not os.path.exists(self.index_dir):
-            os.mkdir(self.index_dir)
-
-        ix = open_dir(self.index_dir)
-        writer = ix.writer()
+        writer = self.index.writer()
         self.index_pdf(writer, pdf_path, doc_id)
         writer.commit() 
+
+
 
     def index_pdf(self, writer, pdf_path, doc_id):
         with open(pdf_path, 'rb') as file:
@@ -31,7 +41,7 @@ class WhooshIRProcessor:
             for page in pdf.pages:
                 text += page.extract_text()
 
-            writer.add_document(id=str(doc_id), title=os.path.basename(pdf_path), content=text)   
+            writer.add_document(id=doc_id, title=os.path.basename(pdf_path), content=text)   
     
 
     def query(self, query_str, k=10):
