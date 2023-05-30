@@ -39,17 +39,21 @@ class FileManager:
         self.vis_data_fname = "vis_data.pkl"
         self.embed_data_fname = "embed.npy"
 
-        self.load() # reads the pickled vis_data and embed_data upon initialization. This might be a problem if file deleted or renamed!!
-        self.scan() # scans the folder for new files and adds them to the index if new exists
+        #self.load() # reads the pickled vis_data and embed_data upon initialization. This might be a problem if file deleted or renamed!!
+        #self.scan() # scans the folder for new files and adds them to the index if new exists
+
 
 
     # will be called upon initialization and when a new file is added to the folder (detected by button press)
     def scan(self):
-        new_embeddings = []        
         # Scan the whole folder for new files
         for paper in os.listdir(self.paper_dir):
-            if paper in self.all_papers: continue  # PDF already processed                
-            #try:    
+            #print(paper)
+            #print(os.listdir(self.paper_dir))
+            
+            if paper in self.all_papers: 
+                continue  # PDF already processed  
+
             # Get the path to PDF
             path = os.path.join(self.paper_dir, paper) 
             # Generate id 
@@ -81,9 +85,6 @@ class FileManager:
             #print(self.embed_data)
             # Add the paper to self.all_papers
             self.all_papers.add(paper)
-            #except Exception as e:
-             #   print(f"Failed to process {paper}: {str(e)}") 
-
       
         # Save the vis_data and embed_data
         self.save()       
@@ -135,7 +136,7 @@ class FileManager:
 
         id = self.embed_data.shape[0] + 1
 
-        return id
+        return int(id)
     
     def get_abstract(self, doc):
         abstract_text = ""
@@ -187,15 +188,25 @@ class FileManager:
         text = self.extract_text_from_pdf_for_embedding(path)
         return paper, text    
 
-
+    # ids_list form: [np.array({id1: score1}, {id2: score2}, ... ) , np.array({id1: score1}, {id2: score2}, ... )]
+    # list of whoosh (id, score) pairs, and embedding (id, score) pairs
     def check_if_files_exists(ids_list):
         # ids is a list of ids for whoosh and embed [w, e]
         processed_ids = []
-        for ids in ids_list:
+        for whoosh_id, embed_id in ids_list:
             # Check if file exists in dynamic tables
+            
             # If not, remove from whoosh and embed
             # Update saved files
             # Remove from ids 
             pass
             
         return processed_ids
+    
+
+
+
+
+
+
+
