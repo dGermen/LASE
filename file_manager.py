@@ -27,31 +27,36 @@ Possible problems:
 
 class FileManager:
 
-    def __init__(self, paper_dir, index_dir, whoosh_manager, embed_manager, vis_data, embed_data):
+    def __init__(self, paper_dir, index_dir, whoosh_manager, embed_manager, vis_data, embed_data, all_papers):
         self.paper_dir = paper_dir
         self.index_dir = index_dir
         self.whoosh_manager = whoosh_manager
         self.embed_manager = embed_manager
         self.vis_data = vis_data
         self.embed_data = embed_data
+        self.all_papers = all_papers
 
-        self.all_papers = set() # keeps all papers added to index 
+        #self.all_papers = set() # keeps all papers added to index 
         self.vis_data_fname = "vis_data.pkl"
         self.embed_data_fname = "embed.npy"
 
         #self.load() # reads the pickled vis_data and embed_data upon initialization. This might be a problem if file deleted or renamed!!
         #self.scan() # scans the folder for new files and adds them to the index if new exists
 
+    def check_paper_processed(self, paper):
+        p_name = os.path.join(self.paper_dir, paper)
+        if p_name in self.all_papers:
+            return True
+        else:
+            return False
 
 
     # will be called upon initialization and when a new file is added to the folder (detected by button press)
     def scan(self):
         # Scan the whole folder for new files
         for paper in os.listdir(self.paper_dir):
-            #print(paper)
-            #print(os.listdir(self.paper_dir))
             
-            if paper in self.all_papers: 
+            if self.check_paper_processed(paper): 
                 continue  # PDF already processed  
 
             # Get the path to PDF
@@ -115,6 +120,7 @@ class FileManager:
                 self.embed_data = np.load(f, allow_pickle=True)
         else:
             self.embed_data = np.empty((0, 1537), dtype=object)
+        pass
 
 
         

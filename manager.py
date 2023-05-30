@@ -18,6 +18,7 @@ class Manager:
         self.embed_data_fname = "embed.npy"
 
         # Load "data"s
+        self.all_papers = set() # keeps all papers added to index
         self.load_data()
 
         # Initilizing used modules
@@ -33,7 +34,8 @@ class Manager:
             whoosh_manager = self.whoosh_manager, 
             embed_manager = self.embed_manager,
             vis_data = self.vis_data,
-            embed_data = self.embed_data)
+            embed_data = self.embed_data,
+            all_papers = self.all_papers)
         
         self.vis_manager = vis_manager.VisManager(
             vis_data = self.vis_data)
@@ -60,6 +62,12 @@ class Manager:
                 self.vis_data = pickle.load(f)  
         else: 
             self.vis_data = dict()
+        
+        # fill in self.all_papers with the keys of titles of self.vis_data
+        for key in self.vis_data.keys():
+            # a = self.vis_data[key]["dir"].split("/")[1]
+            self.all_papers.add(self.vis_data[key]["dir"])
+        
 
         # check if the path: self.index_dir + self.embed_data_fname exists
         embed_data_path = os.path.join(self.index_dir, self.embed_data_fname)
@@ -68,15 +76,23 @@ class Manager:
                 self.embed_data = np.load(f, allow_pickle=True)
         else:
             self.embed_data = np.empty((0, 1537), dtype=object)
+        pass
 
     
     def query(self,query):
         result = self.query_manager.query(query)
 
-        result = self.file_manager.check_if_files_exists(result)
+        #result = self.file_manager.check_if_files_exists(result)
 
         return result
+    
 
+
+if __name__ == "__main__":
+    manager = Manager()
+    manager.scan()
+    a = manager.query("machine learning")
+    print(a)
 
 
 
