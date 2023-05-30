@@ -91,8 +91,15 @@ class Manager:
 if __name__ == "__main__":
     manager = Manager()
     manager.scan()
-    a = manager.query("machine learning")
-    print(a)
+    a = manager.query("Eric")
+    #print(a)
+    for key, val in manager.vis_data.items():
+        print(key, val)
+        print()
+    for w, e in a:
+        print(w)
+        
+        manager.vis_data[int(w)]["dir"]
 
 
 

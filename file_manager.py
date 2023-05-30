@@ -194,20 +194,8 @@ class FileManager:
         text = self.extract_text_from_pdf_for_embedding(path)
         return paper, text    
 
-    # ids_list form: [np.array({id1: score1}, {id2: score2}, ... ) , np.array({id1: score1}, {id2: score2}, ... )]
-    # list of whoosh (id, score) pairs, and embedding (id, score) pairs
-    def check_if_files_exists(ids_list):
-        # ids is a list of ids for whoosh and embed [w, e]
-        processed_ids = []
-        for whoosh_id, embed_id in ids_list:
-            # Check if file exists in dynamic tables
-            
-            # If not, remove from whoosh and embed
-            # Update saved files
-            # Remove from ids 
-            pass
-            
-        return processed_ids
+
+
     
 
 
