@@ -84,6 +84,8 @@ class EmbedManager:
 
         # Compute cosine similarity between the random embedding and all embeddings in EMD
         similarities = cosine_similarity(self.embed_data[:, 1:], [embedding])
+        min = similarities.min()
+        max = similarities.max()
 
         # Sort the cosine similarity scores in descending order
         sorted_indices = np.argsort(similarities, axis=0)[::-1]
@@ -91,16 +93,28 @@ class EmbedManager:
         # Retrieve the IDs of the top k most similar embeddings
         top_k_ids = self.embed_data[sorted_indices[:k], 0]
 
-        return top_k_ids
+        # Retrieve similarity scores of the top k most similar embeddings
+        top_k_scores = similarities[sorted_indices[:k], 0]
+
+        # Scale the similarity scores to be between 0 and 1, use variables min max
+        top_k_scores_scaled = (top_k_scores - min) / (max - min)
+
+        # Create a list of dictionaries of the top k most similar embeddings and their similarity scores
+        result = [{'id': id, 's_e_score': s_e_score, 'e_score': e_score} for id, s_e_score, e_score in zip(top_k_ids, top_k_scores_scaled,top_k_scores)]
+
+
+        return result
     
     def query(self, w_ids, query, n):
         # Get the embedding of the query
-        query_embed = self.embed(query)
+        #query_embed = self.embed(query)
+        
+        query_embed = embedding = np.random.rand(1536)
 
         # Weigt the embeddings
         weighted_average_embed = self.embed_weighting(query_embed, w_ids)
         
         # Get the top n ids
-        top_n_ids = self.embeddings_knn(weighted_average_embed, n)
+        top_n_results = self.embeddings_knn(weighted_average_embed, n)
         
-        return top_n_ids
+        return top_n_results
