@@ -19,119 +19,107 @@ class MyWindow(QtWidgets.QMainWindow):
         self.text = QtWidgets.QLineEdit()
         layout.addWidget(self.text)
 
-        self.view_mode_button = QtWidgets.QPushButton('Switch to combined view')
-        layout.addWidget(self.view_mode_button)
-        self.view_mode_button.clicked.connect(self.switch_view_mode)
+        button = QtWidgets.QPushButton('Search')
+        layout.addWidget(button)
+        button.clicked.connect(self.OnSearch)
 
-        self.view_mode = 'separate'
+        self.switch_button = QtWidgets.QPushButton('Switch to Combined')
+        layout.addWidget(self.switch_button)
+        self.switch_button.clicked.connect(self.OnSwitch)
 
         self.stack_layout = QtWidgets.QStackedLayout()
         layout.addLayout(self.stack_layout)
 
-        self.separate_layout = QtWidgets.QWidget()
-        separate_layout = QtWidgets.QVBoxLayout(self.separate_layout)
-        self.stack_layout.addWidget(self.separate_layout)
+        # Separate view
+        self.sep_layout = QtWidgets.QWidget()
+        separate_layout = QtWidgets.QHBoxLayout(self.sep_layout)
+        self.stack_layout.addWidget(self.sep_layout)
 
-        # IR results title
-        ir_title = QtWidgets.QLabel('Whoosh Results')
-        separate_layout.addWidget(ir_title)
-        self.ir_model = QtGui.QStandardItemModel(self)
-        self.ir_model.setHorizontalHeaderLabels(['Title', 'Abstract', 'Path', 'Score'])
-        self.ir_view = QtWidgets.QTableView()
-        self.ir_view.setModel(self.ir_model)
-        self.ir_view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.ir_view.verticalHeader().setDefaultSectionSize(3 * self.ir_view.verticalHeader().defaultSectionSize())
-        self.ir_view.verticalHeader().setVisible(False)
-        self.ir_view.setShowGrid(True)
-        self.ir_view.setGridStyle(QtCore.Qt.SolidLine)
-        self.ir_view.setStyleSheet("QTableView { gridline-color: black } ")
-        separate_layout.addWidget(self.ir_view)
+        # Whoosh results
+        whoosh_layout = QtWidgets.QVBoxLayout()
+        separate_layout.addLayout(whoosh_layout)
+        whoosh_label = QtWidgets.QLabel('Whoosh Results')
+        whoosh_layout.addWidget(whoosh_label)
 
-        # Embedding results title
-        embed_title = QtWidgets.QLabel('Embedding Results')
-        separate_layout.addWidget(embed_title)
+        self.whoosh_model = QtGui.QStandardItemModel(self)
+        self.whoosh_model.setHorizontalHeaderLabels(['Title', 'Abstract', 'Path', 'Score'])
+        self.whoosh_view = QtWidgets.QTableView()
+        self.whoosh_view.setModel(self.whoosh_model)
+        self.whoosh_view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        whoosh_layout.addWidget(self.whoosh_view)
+
+        # Embedding results
+        embed_layout = QtWidgets.QVBoxLayout()
+        separate_layout.addLayout(embed_layout)
+        embed_label = QtWidgets.QLabel('Embedding Results')
+        embed_layout.addWidget(embed_label)
+
         self.embed_model = QtGui.QStandardItemModel(self)
         self.embed_model.setHorizontalHeaderLabels(['Title', 'Abstract', 'Path', 'Score'])
         self.embed_view = QtWidgets.QTableView()
         self.embed_view.setModel(self.embed_model)
         self.embed_view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.embed_view.verticalHeader().setDefaultSectionSize(3 * self.embed_view.verticalHeader().defaultSectionSize())
-        self.embed_view.verticalHeader().setVisible(False)
-        self.embed_view.setShowGrid(True)
-        self.embed_view.setGridStyle(QtCore.Qt.SolidLine)
-        self.embed_view.setStyleSheet("QTableView { gridline-color: black } ")
-        separate_layout.addWidget(self.embed_view)
+        embed_layout.addWidget(self.embed_view)
 
-        self.combined_layout = QtWidgets.QWidget()
-        combined_layout = QtWidgets.QVBoxLayout(self.combined_layout)
-        self.stack_layout.addWidget(self.combined_layout)
+        # Combined view
+        self.comb_layout = QtWidgets.QWidget()
+        combined_layout = QtWidgets.QVBoxLayout(self.comb_layout)
 
-        # Combined results title
-        combined_title = QtWidgets.QLabel('Combined Results')
-        combined_layout.addWidget(combined_title)
-        self.combined_model = QtGui.QStandardItemModel(self)
-        self.combined_model.setHorizontalHeaderLabels(['Title', 'Abstract', 'Path', 'Score'])
-        self.combined_view = QtWidgets.QTableView()
-        self.combined_view.setModel(self.combined_model)
-        self.combined_view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.combined_view.verticalHeader().setDefaultSectionSize(3 * self.combined_view.verticalHeader().defaultSectionSize())
-        self.combined_view.verticalHeader().setVisible(False)
-        self.combined_view.setShowGrid(True)
-        self.combined_view.setGridStyle(QtCore.Qt.SolidLine)
-        self.combined_view.setStyleSheet("QTableView { gridline-color: black } ")
-        combined_layout.addWidget(self.combined_view)
+        # Legend for combined view
+        legend_layout = QtWidgets.QHBoxLayout()
+        combined_layout.addLayout(legend_layout)
+        legend_layout.addWidget(QtWidgets.QLabel('Legend: '))
+        legend_layout.addWidget(self.create_legend_label('Embed', QtGui.QColor(255, 230, 232)))
+        legend_layout.addWidget(self.create_legend_label('Whoosh', QtGui.QColor(146, 180, 167)))
+        legend_layout.addWidget(self.create_legend_label('Both', QtGui.QColor(129, 102, 122)))
 
-        self.ir_view.doubleClicked.connect(self.OnItemActivated)
+        self.comb_model = QtGui.QStandardItemModel(self)
+        self.comb_model.setHorizontalHeaderLabels(['Title', 'Abstract', 'Path', 'Score'])
+        self.comb_view = QtWidgets.QTableView()
+        self.comb_view.setModel(self.comb_model)
+        self.comb_view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        combined_layout.addWidget(self.comb_view)
+
+        self.stack_layout.addWidget(self.comb_layout)
+        self.stack_layout.setCurrentWidget(self.sep_layout)
+
+        self.whoosh_view.doubleClicked.connect(self.OnItemActivated)
         self.embed_view.doubleClicked.connect(self.OnItemActivated)
-        self.combined_view.doubleClicked.connect(self.OnItemActivated)
-
-        # Initialize with the separate view
-        self.stack_layout.setCurrentWidget(self.separate_layout)
+        self.comb_view.doubleClicked.connect(self.OnItemActivated)
 
     def OnSearch(self):
         query = self.text.text()
-        # results = self.manager.query(query)
-        results = {
-            "separate": [[{"id": 1, "score": 0.1}, {"id": 2, "score": 0.2}],
-                         [{"id": 1, "score": 0.1}, {"id": 2, "score": 0.2}]],
-            "combined": [{"id": 3, "score": 0.5, "src": "embed"}, {"id": 4, "score": 0.2, "src": "whoosh"}]
-        }
+        results = self.manager.query(query)
 
-        if self.view_mode == 'separate':
-            self.populate_table(self.ir_model, results['separate'][0], 'whoosh')
-            self.populate_table(self.embed_model, results['separate'][1], 'embed')
-        else:  # combined view
-            self.populate_table(self.combined_model, results['combined'])
+        self.populate_table(self.whoosh_model, results["separate"][0], "")
+        self.populate_table(self.embed_model, results["separate"][1], "")
+        self.populate_table(self.comb_model, results["combined"], "combined")
 
-    def populate_table(self, model, ids, src='both'):
+    def populate_table(self, model, results, table_type):
         model.removeRows(0, model.rowCount())
-        for result in ids:
-            id = result['id']
-            score = result['score']
+        for res in results:
+            id = res['id']
             paper_dict = self.manager.vis_data[id]
-            items = [QtGui.QStandardItem(paper_dict['title']), QtGui.QStandardItem(paper_dict['abstract']), QtGui.QStandardItem(paper_dict['dir']), QtGui.QStandardItem(str(score))]
-            row = model.appendRow(items)
-            if src == 'whoosh':
-                for item in items:
-                    item.setBackground(QtGui.QColor(255, 0, 0))
-            elif src == 'embed':
-                for item in items:
-                    item.setBackground(QtGui.QColor(0, 255, 0))
-            else:  # both
-                for item in items:
-                    item.setBackground(QtGui.QColor(0, 0, 255))
+            items = [QtGui.QStandardItem(paper_dict['title']), QtGui.QStandardItem(paper_dict['abstract']), QtGui.QStandardItem(paper_dict['dir']), QtGui.QStandardItem(str(res['score']))]
+            if table_type == "combined":
+                if res['src'] == "embed":
+                    for item in items:                                                
+                        item.setBackground(QtGui.QColor(255, 230, 232))
+                elif res['src'] == "whoosh":
+                    for item in items:
+                        item.setBackground(QtGui.QColor(146, 180, 167))
+                elif res['src'] == "both":
+                    for item in items:
+                        item.setBackground(QtGui.QColor(129, 102, 122))
+            model.appendRow(items)
 
-    def switch_view_mode(self):
-        if self.view_mode == 'separate':
-            self.view_mode = 'combined'
-            self.view_mode_button.setText('Switch to separate view')
-            self.stack_layout.setCurrentWidget(self.combined_layout)
+    def OnSwitch(self):
+        if self.stack_layout.currentWidget() == self.sep_layout:
+            self.stack_layout.setCurrentWidget(self.comb_layout)
+            self.switch_button.setText('Switch to Separate')
         else:
-            self.view_mode = 'separate'
-            self.view_mode_button.setText('Switch to combined view')
-            self.stack_layout.setCurrentWidget(self.separate_layout)
-
-        self.OnSearch()
+            self.stack_layout.setCurrentWidget(self.sep_layout)
+            self.switch_button.setText('Switch to Combined')
 
     def OnItemActivated(self, index):
         if index.column() == 1:  # Show the Abstract text in a scrollable MessageBox when double-clicked
@@ -142,13 +130,25 @@ class MyWindow(QtWidgets.QMainWindow):
             msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
             msg.exec_()
         elif index.column() == 2:  # Open the paper only when 'Path' is double clicked
+
             path = index.sibling(index.row(), 2).data()
             paper = path.split("/")[-1]
             path1 = os.path.join(os.getcwd(), "papers")
             path = os.path.join(path1, paper)
 
-            if os.path.isfile(path):
-                subprocess.Popen([path], shell=True)
+            print("curr path: ", path)
+
+            try:
+                if os.path.isfile(path):
+                    print("opening file: ", path) 
+                    subprocess.Popen([path], shell=True)
+            except Exception as e:
+                print(f"Failed to open file: {path}, error: {e}")
+
+    def create_legend_label(self, text, color):
+        label = QtWidgets.QLabel(text)
+        label.setStyleSheet(f'background-color: {color.name()};')
+        return label
 
 app = QtWidgets.QApplication([])
 window = MyWindow()
