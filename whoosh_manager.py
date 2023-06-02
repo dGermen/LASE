@@ -57,7 +57,4 @@ class WhooshIRProcessor:
         searcher.close()
         return top_k_ids
     
-
-
-
        
