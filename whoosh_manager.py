@@ -52,9 +52,17 @@ class WhooshIRProcessor:
         query = QueryParser("content", ix.schema).parse(query_str)
         results = searcher.search(query, limit=k)
         #top_k_ids = [hit['id'] for hit in results]
-        # uncomment the following if you want to see the scores
-        top_k_ids = [{"id": hit['id'], "score": hit.score} for hit in results]
+
+        # Scale scores to 0-1 range using min max
+        scores = [hit.score for hit in results]
+        min_score = min(scores)
+        max_score = max(scores)
+
+
+        # Record results to different dictionaries as id, w_score, e_w_score
+        top_k_result = [{"id": hit['id'], "w_score": hit.score, "s_w_score": (hit.score - min_score) / (max_score - min_score)} for hit in results]
+
         searcher.close()
-        return top_k_ids
+        return top_k_result
     
        
