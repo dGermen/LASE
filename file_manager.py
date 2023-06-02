@@ -55,6 +55,10 @@ class FileManager:
     def scan(self):
         # Scan the whole folder for new files
         for paper in os.listdir(self.paper_dir):
+            print("Scanning: ", paper)
+            # Check if paper ending with .pdf
+            if not paper.endswith(".pdf"):
+                continue
             
             if self.check_paper_processed(paper): 
                 continue  # PDF already processed  
@@ -79,7 +83,11 @@ class FileManager:
 
             # Add to index
             # Schema(id=NUMERIC(stored=True, unique=True), title=TEXT(stored=True), content=TEXT(stored=True))
+
+
             self.whoosh_manager.add_index(path, id)
+
+
             # Update the vis_data
             self.vis_data[id] = paper_dict
             # Add id infornt of embedding

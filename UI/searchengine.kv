@@ -1,0 +1,51 @@
+#:import utils kivy.utils
+#:import MDTextField kivymd.uix.textfield.MDTextField
+#:import MDRaisedButton kivymd.uix.button.MDRaisedButton
+#:import MDLabel kivymd.uix.label.MDLabel
+#:import MDCard kivymd.uix.card.MDCard
+
+<SearchEngineLayout>:
+    orientation: 'vertical'
+    padding: '20dp'
+    spacing: '20dp'
+    md_bg_color: utils.get_color_from_hex('#101010')
+
+    BoxLayout:
+        size_hint: 1, None
+        height: '48dp'
+        spacing: '10dp'
+
+        MDTextField:
+            id: query_bar
+            hint_text: 'Enter your query here'
+            helper_text_mode: "on_focus"
+            size_hint_x: 75
+            pos_hint: {'center_y':.5}
+            theme_text_color: "Custom"
+            text_color: utils.get_color_from_hex('#ffffff')
+            line_color_focus: utils.get_color_from_hex('#03DAC6')
+
+        MDRaisedButton:
+            text: 'Search'
+            size_hint_x: 25
+            pos_hint: {'center_y':.5}
+            md_bg_color: utils.get_color_from_hex('#03DAC6')
+            on_press: root.perform_search(query_bar.text)
+
+    ScrollView:
+        do_scroll_x: False
+        MDCard:
+            orientation: "vertical"
+            size_hint: None, None
+            size: "280dp", "180dp"
+            pos_hint: {"center_x": .5}
+
+            BoxLayout:
+                MDLabel:
+                    id: results_label
+                    text: 'Results will be displayed here.'
+                    theme_text_color: "Secondary"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    valign: 'top'
+                    padding: 10, 10

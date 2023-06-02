@@ -8,7 +8,7 @@ class EmbedManager:
 
     def __init__(self, 
                 embed_data,
-                openai_apikey = "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",
+                openai_apikey = "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",
                 model = "text-embedding-ada-002",
                  ):
         pass
@@ -30,7 +30,8 @@ class EmbedManager:
                 )
                 done = True
 
-            except openai.RateLimitError as e:
+            except Exception as e:
+                print(e)
                 print("Rate limit error, waiting for 0.1 seconds")
                 time.sleep(0.1)
                 continue
@@ -51,18 +52,21 @@ class EmbedManager:
             # If weights are not given, use equal weights
             weights = np.ones(len(ids))
         
-        # Weight of the query
-        weights.append = len(ids) / 2
+        # Set query weight to the average of the weights
+        q_weight = np.sum(weights) / 2
+
+        # Append the query weight to the weights
+        weights = np.append(weights, q_weight)
 
         # Scale weights
         weights = weights / np.sum(weights)
 
-        embeddings = []
-        # Get embeddings
-        for id in ids:
-            embeddings.append(self.find_embedding(id))
-
-        embeddings.append(query_embed)
+        
+        # Get embeddings, store in 2d numpy array
+        embeddings = np.array([self.find_embedding(id)[0][1:] for id in ids])
+        
+        # Append the query embedding to the embeddings
+        embeddings = np.append(embeddings, [query_embed], axis=0)
 
         # Get weighted average
         weighted_average = np.average(embeddings, axis=0, weights=weights)

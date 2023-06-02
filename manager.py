@@ -44,11 +44,7 @@ class Manager:
             whoosh = self.whoosh_manager,
             embed_manager = self.embed_manager)
 
-        # Initilizing check if folders exist if not create them
-
-        # Load them as variables to self
-
-        # Scan the whole folder for new files
+        self.scan()
 
     def scan(self):
         # Scan the whole folder for new files
@@ -80,26 +76,13 @@ class Manager:
 
     
     def query(self,query):
-        result = self.query_manager.query(query)
 
-        #result = self.file_manager.check_if_files_exists(result)
+        result = self.query_manager.query(query)
 
         return result
     
 
 
-if __name__ == "__main__":
-    manager = Manager()
-    manager.scan()
-    a = manager.query("Eric")
-    #print(a)
-    for key, val in manager.vis_data.items():
-        print(key, val)
-        print()
-    for w, e in a:
-        print(w)
-        
-        manager.vis_data[int(w)]["dir"]
 
 
 
