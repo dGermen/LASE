@@ -100,8 +100,11 @@ class EmbedManager:
         top_k_scores_scaled = (top_k_scores - min) / (max - min)
 
         # Create a list of dictionaries of the top k most similar embeddings and their similarity scores
-        result = [{'id': id, 's_e_score': s_e_score, 'e_score': e_score} for id, s_e_score, e_score in zip(top_k_ids, top_k_scores_scaled,top_k_scores)]
+        result = [{'id': int(id), 's_e_score': float(s_e_score), 'e_score': float(e_score)} for id, s_e_score, e_score in zip(top_k_ids, top_k_scores_scaled,top_k_scores)]
 
+        # Turn id into int
+        for r in result:
+            r["id"] = int(r["id"])
 
         return result
     
