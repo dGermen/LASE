@@ -26,10 +26,6 @@ class WhooshIRProcessor:
             print(f"Index not found at {self.index_dir}. Creating new index.")
             self.index = index.create_in(self.index_dir, self.schema)
             print(f"New index created at {self.index_dir}.")
-        
-
-            
-
 
 
     def add_index(self, pdf_path, doc_id):
