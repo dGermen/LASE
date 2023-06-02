@@ -11,10 +11,11 @@ import numpy as np
 class WhooshIRProcessor:
 
     def __init__(self, index_dir) -> None:
+        print(f"Initializing WhooshIRProcessor with index_dir: {index_dir}")
         self.index_dir = index_dir + "/whoosh_index"
         self.schema = Schema(id=NUMERIC(stored=True, unique=True), title=TEXT(stored=True), content=TEXT(stored=True))
 
-        # if index_dir dos not exist, create it
+        # if index_dir does not exist, create it
         if not os.path.exists(self.index_dir):
             os.mkdir(self.index_dir)
 
@@ -49,11 +50,18 @@ class WhooshIRProcessor:
     
 
     def query(self, query_str, k=10):
+        print(f"Searching for {query_str}")
         ix = open_dir(self.index_dir)
         searcher = ix.searcher()
         query = QueryParser("content", ix.schema).parse(query_str)
         results = searcher.search(query, limit=k)
-        top_k_ids = np.array([hit['id'] for hit in results])
+        #top_k_ids = [hit['id'] for hit in results]
+        # uncomment the following if you want to see the scores
+        top_k_ids = [{"id": hit['id'], "score": hit.score} for hit in results]
         searcher.close()
-        return top_k_ids.tolist() 
+        return top_k_ids
+    
+
+
+
        
