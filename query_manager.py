@@ -29,11 +29,13 @@ class QueryManager:
         c = []
         for e, w in zip(e_results, w_results):
             if e["id"] == w["id"]:
-                c.append({"id": e["id"], "score": e["s_e_score"] + w["s_w_score"]})
+                c.append({"id": e["id"], "score": e["s_e_score"] + w["s_w_score"],"src": "both"})
             else:
                 e["score"] = e["s_e_score"]
-                w["score"] = w["s_w_score"]
+                e["src"] = "embed"
                 c.append(e)
+                w["score"] = w["s_w_score"]
+                w["src"] = "whoosh"
                 c.append(w)
 
         # Sort c according to score
