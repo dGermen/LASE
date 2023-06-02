@@ -5,7 +5,7 @@ import time
 import pickle
 import numpy as np
 
-'''
+"""
 vis_data = { <id_1> : { title : <title_1>,
                         abstract: <abstract_1>,
                         path = <path_2>
@@ -16,14 +16,13 @@ vis_data = { <id_1> : { title : <title_1>,
                         },
 
             }
-'''
 
-"""
 Possible problems:
 1. What if the file is deleted from the folder? Saving the vis_data and embed_data might be a problem
 2. What if the file is renamed? Saving the vis_data and embed_data might be a problem
 
 """
+
 
 class FileManager:
 

@@ -15,10 +15,11 @@ class QueryManager:
             return [[], []]
 
         # Get the results from embedding
-        e_results = self.embed_manager.query(w_ids, query, n = n)
+        #e_results = self.embed_manager.query(w_ids, query, n = n)
         
         # Combine the results
         
+        e_ids = [0, 2]
 
         return [w_ids, e_ids]
         

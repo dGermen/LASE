@@ -72,7 +72,7 @@ class Manager:
                 self.embed_data = np.load(f, allow_pickle=True)
         else:
             self.embed_data = np.empty((0, 1537), dtype=object)
-        pass
+        
 
     
     def query(self,query):
