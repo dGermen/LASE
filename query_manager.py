@@ -12,7 +12,8 @@ class QueryManager:
         w_ids = self.whoosh.query(query, k = k)
 
         # Get the results from embedding
-        e_ids = self.embed_manager.query(w_ids, query, n = n)
+        #e_ids = self.embed_manager.query(w_ids, query, n = n)
+        e_ids = [0, 2]
         
         return [w_ids, e_ids]
         
