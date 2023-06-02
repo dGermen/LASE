@@ -201,7 +201,10 @@ class FileManager:
         text = self.extract_text_from_pdf_for_embedding(path)
         return paper, text    
 
-
+    def extract_chapters(self, text):
+        # Return chapter name and chapter text
+        # Unknown chapters in the chapter list is named as "Unknown"
+        pass
 
     
 
