@@ -1,4 +1,4 @@
-
+import itertools
 
 class QueryManager:
 
@@ -13,7 +13,7 @@ class QueryManager:
         w_ids = [r["id"] for r in w_results]
 
         if len(w_results) == 0:
-            return {"seperated": [], "combined": []}
+            return {"separate": [], "combined": []}
 
         # Get the results from embedding
         e_results = self.embed_manager.query(w_ids, query, n = n)
@@ -21,24 +21,32 @@ class QueryManager:
         # Combine the results
         c_results = self.combine_results(w_results, e_results)
 
-        return {"seperated": [w_results, e_results], "combined": [c_results]}
+        return {"separate": [w_results, e_results], "combined": c_results}
         
         # Return 10 results from whoosh 10 from embedding IDS
     
     def combine_results(self, w_results, e_results):
-        c = []
-        for e, w in zip(e_results, w_results):
-            if e["id"] == w["id"]:
-                c.append({"id": e["id"], "score": e["s_e_score"] + w["s_w_score"],"src": "both"})
-            else:
-                e["score"] = e["s_e_score"]
-                e["src"] = "embed"
-                c.append(e)
-                w["score"] = w["s_w_score"]
-                w["src"] = "whoosh"
-                c.append(w)
+        w_dict = {item['id']: item for item in w_results}
+        e_dict = {item['id']: item for item in e_results}
 
-        # Sort c according to score
-        c = sorted(c, key=lambda k: k['score'], reverse=True)
+        combined = []
+        all_ids = set(w_dict.keys()).union(e_dict.keys())
 
-        return c
+        for id_ in all_ids:
+            w_item = w_dict.get(id_)
+            e_item = e_dict.get(id_)
+            if w_item is not None and e_item is not None:
+                combined.append({"id": id_, "score": e_item["s_e_score"] + w_item["s_w_score"], "src": "both"})
+            elif e_item is not None:
+                e_item["score"] = e_item["s_e_score"]
+                e_item["src"] = "embed"
+                combined.append(e_item)
+            elif w_item is not None:
+                w_item["score"] = w_item["s_w_score"]
+                w_item["src"] = "whoosh"
+                combined.append(w_item)
+
+        # Sort combined according to score
+        combined = sorted(combined, key=lambda k: k['score'], reverse=True)
+
+        return combined
