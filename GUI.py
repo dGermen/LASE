@@ -91,11 +91,33 @@ class MyWindow(QtWidgets.QMainWindow):
         query = self.text.text()
         results = self.manager.query(query)
 
-        self.populate_table(self.whoosh_model, results["separate"][0], "")
-        self.populate_table(self.embed_model, results["separate"][1], "")
-        self.populate_table(self.comb_model, results["combined"], "combined")
+        if results["separate"]:
+            self.populate_table(self.whoosh_model, results["separate"][0], "")
+            self.populate_table(self.embed_model, results["separate"][1], "")
+        else:
+            self.clear_table(self.whoosh_model)
+            self.clear_table(self.embed_model)
+            print("No separate results found for the search query.")
+
+        if results["combined"]:
+            self.populate_table(self.comb_model, results["combined"], "combined")
+        else:
+            self.clear_table(self.comb_model)
+            print("No combined results found for the search query.")
+
+    def clear_table(self, model):
+        model.removeRows(0, model.rowCount())
+
 
     def populate_table(self, model, results, table_type):
+        if not isinstance(results, list):
+            print("Error: results is not a list")
+            return
+
+        if not all(res['id'] in self.manager.vis_data for res in results):
+            print("Error: One or more IDs in results are not in self.manager.vis_data")
+            return
+
         model.removeRows(0, model.rowCount())
         for res in results:
             id = res['id']
@@ -112,6 +134,7 @@ class MyWindow(QtWidgets.QMainWindow):
                     for item in items:
                         item.setBackground(QtGui.QColor(129, 102, 122))
             model.appendRow(items)
+
 
     def OnSwitch(self):
         if self.stack_layout.currentWidget() == self.sep_layout:
